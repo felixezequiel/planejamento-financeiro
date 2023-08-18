@@ -1,17 +1,11 @@
-import express from 'express';
-import cors from 'cors';
-import { configCors } from './config/cors/configCors';
+import './config/environment';
+import { Routes } from './domain/routes/routes';
+import { ExpressController } from './infrastructure/frameworks/express/expressController';
 
-const app = express();
+const port = process.env.CONFIG_SERVER_PORT!;
 
-app.use(express.json());
+const routes = new Routes([]);
 
-app.use(express.urlencoded({ extended: true }));
+const expressController = new ExpressController(routes);
 
-app.use(cors(configCors));
-
-const port = process.env.CONFIG_SERVER_PORT;
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+expressController.listen(Number(port));
