@@ -7,7 +7,7 @@ import { configCors } from '../../../config/cors/configCors';
 export class ExpressController implements IExpress {
   public app: Express;
 
-  constructor(public routes: IRoutes) {
+  constructor() {
     this.app = express();
 
     this.app.use(express.json());
@@ -61,8 +61,8 @@ export class ExpressController implements IExpress {
     });
   }
 
-  private configureRoutes(): void {
-    this.routes.routes.forEach((route) => {
+  public configureRoutes(routes: IRoutes): void {
+    routes.routes.forEach((route) => {
       if (route.middleware) {
         this.executeWithMiddlewares(route);
       } else {
@@ -71,9 +71,7 @@ export class ExpressController implements IExpress {
     });
   }
 
-  listen(port: number): void {
-    this.configureRoutes();
-
+  public listen(port: number): void {
     this.app.listen(port, () => {
       console.log(`Server listening on port ${port}`);
     });
