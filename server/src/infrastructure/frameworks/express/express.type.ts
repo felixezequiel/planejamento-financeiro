@@ -1,5 +1,5 @@
 import { Express } from 'express';
-import { IRoutes } from '../../../domain/routes/routes.type';
+import { IRoutes } from '../../routes/routes.type';
 
 export interface IExpress {
   app: Express;

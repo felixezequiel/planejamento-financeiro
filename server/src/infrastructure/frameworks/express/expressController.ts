@@ -1,5 +1,5 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
-import { IRoutes, Route } from '../../../domain/routes/routes.type';
+import { IRoutes, Route } from '../../routes/routes.type';
 import { IExpress } from './express.type';
 import cors from 'cors';
 import { configCors } from '../../../config/cors/configCors';
@@ -30,11 +30,35 @@ export class ExpressController implements IExpress {
       }
     };
 
-    this.app[route.verb](route.path, handleMiddlewares, route.handler);
+    this.app[route.verb](route.path, handleMiddlewares, async (req: Request, res: Response) => {
+      try {
+        const payload = { ...req.body, ...req.params, ...req.query };
+
+        const response = await route.handler(payload);
+
+        if (!response) return res.status(204).json();
+
+        res.status(200).json(response);
+      } catch (error) {
+        res.status(500).json(error);
+      }
+    });
   }
 
   private executeWithoutMiddlewares(route: Route): void {
-    this.app[route.verb](route.path, route.handler);
+    this.app[route.verb](route.path, async (req: Request, res: Response) => {
+      try {
+        const payload = { ...req.body, ...req.params, ...req.query };
+
+        const response = await route.handler(payload);
+
+        if (!response) return res.status(204).json();
+
+        res.status(200).json(response);
+      } catch (error) {
+        res.status(500).json(error);
+      }
+    });
   }
 
   private configureRoutes(): void {
