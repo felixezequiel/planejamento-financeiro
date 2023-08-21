@@ -5,7 +5,7 @@ sleep 30
 
 echo "done"
 
-echo rs-init.sh time now: `date +"%T" `
+echo rs-init-test.sh time now: `date +"%T" `
 
 mongosh --host mongodbtest0:27017 <<EOF
 var cfg = {
@@ -25,8 +25,10 @@ var cfg = {
         }
     ]
 };
+
 rs.initiate(cfg);
+
 rs.secondaryOk();
-db.getMongo().setReadPref('primary');
+
 rs.status();
 EOF

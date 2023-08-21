@@ -4,14 +4,65 @@ networks:
   local:
 
 services:
-  mongo-replica-setup:
-    container_name: mongo-setup
+  mongo-setup-dev:
+    container_name: mongo-setup-dev
     image: mongodb/mongodb-community-server:6.0-ubi8
     restart: on-failure
     volumes:
-      - ./config/mongo/rs-init.sh:/scripts/rs-init.sh
+      - ./config/mongo/rs-init-dev.sh:/scripts/rs-init-dev.sh
     # entrypoint: ["bash"]
-    entrypoint: ["bash", "/scripts/rs-init.sh" ]
+    entrypoint: ["bash", "/scripts/rs-init-dev.sh" ]
+    networks:
+      - local
+    depends_on:
+      - mongodb0
+      - mongodb1
+      - mongodb2
+
+  mongodb0:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongodb0
+    cpus: 0.5
+    ports:
+      - 27017:27017
+    volumes:
+      - ./config/data/dev0:/data/db
+    networks:
+      - local
+    command: mongod --replSet rs0 --bind_ip localhost,mongodb0
+
+  mongodb1:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongodb1
+    cpus: 0.5
+    ports:
+      - 27018:27017
+    volumes:
+     - ./config/data/dev1:/data/db
+    networks:
+      - local
+    command: mongod --replSet rs0 --bind_ip localhost,mongodb1
+
+  mongodb2:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongodb2
+    cpus: 0.5
+    ports:
+      - 27019:27017
+    volumes:
+      - ./config/data/dev2:/data/db
+    networks:
+      - local
+    command: mongod --replSet rs0 --bind_ip localhost,mongodb2
+
+  mongo-setup-test:
+    container_name: mongo-setup-test
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    restart: on-failure
+    volumes:
+      - ./config/mongo/rs-init-test.sh:/scripts/rs-init-test.sh
+    # entrypoint: ["bash"]
+    entrypoint: ["bash", "/scripts/rs-init-test.sh" ]
     networks:
       - local
     depends_on:
@@ -24,9 +75,7 @@ services:
     container_name: mongodbtest0
     cpus: 0.5
     ports:
-      - 27017:27017
-    volumes:
-      - ./config/data/test0:/data/db
+      - 27020:27017
     networks:
       - local
     command: mongod --replSet rs0 --bind_ip localhost,mongodbtest0
@@ -36,9 +85,7 @@ services:
     container_name: mongodbtest1
     cpus: 0.5
     ports:
-      - 27018:27017
-    volumes:
-     - ./config/data/test1:/data/db
+      - 27021:27017
     networks:
       - local
     command: mongod --replSet rs0 --bind_ip localhost,mongodbtest1
@@ -48,9 +95,7 @@ services:
     container_name: mongodbtest2
     cpus: 0.5
     ports:
-      - 27019:27017
-    volumes:
-      - ./config/data/test2:/data/db
+      - 27022:27017
     networks:
       - local
     command: mongod --replSet rs0 --bind_ip localhost,mongodbtest2
