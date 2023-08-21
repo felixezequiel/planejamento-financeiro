@@ -4,43 +4,27 @@ import { TransactionRepository } from '../../../infrastructure/adapters/reposito
 import { TransactionUpdate } from './transactionUseCase.type';
 
 export class TransactionUseCase {
+  private transactionRepository = new TransactionRepository();
+
+  private transactionService = new TransactionService(this.transactionRepository);
+
   public async save(payload: Transaction[]): Promise<void> {
-    const transactionRepository = new TransactionRepository();
-
-    const transactionService = new TransactionService(transactionRepository);
-
-    await transactionService.save(payload);
+    await this.transactionService.save(payload);
   }
 
   public async update(payload: TransactionUpdate): Promise<void> {
-    const transactionRepository = new TransactionRepository();
-
-    const transactionService = new TransactionService(transactionRepository);
-
-    await transactionService.update(payload.id, payload);
+    await this.transactionService.update(payload.id, payload);
   }
 
   public async delete(payload: { id: string }): Promise<void> {
-    const transactionRepository = new TransactionRepository();
-
-    const transactionService = new TransactionService(transactionRepository);
-
-    await transactionService.delete(payload.id);
+    await this.transactionService.delete(payload.id);
   }
 
   public async get(payload: { id: string }): Promise<Transaction> {
-    const transactionRepository = new TransactionRepository();
-
-    const transactionService = new TransactionService(transactionRepository);
-
-    return await transactionService.get(payload.id);
+    return await this.transactionService.get(payload.id);
   }
 
   public async getAll(payload: { userId: string }): Promise<Transaction[]> {
-    const transactionRepository = new TransactionRepository();
-
-    const transactionService = new TransactionService(transactionRepository);
-
-    return await transactionService.getAll(payload.userId);
+    return await this.transactionService.getAll(payload.userId);
   }
 }

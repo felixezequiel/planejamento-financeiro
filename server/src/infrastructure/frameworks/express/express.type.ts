@@ -1,9 +1,6 @@
-import { Express } from 'express';
 import { IRoutes } from '../../routes/routes.type';
 
-export interface IExpress {
-  app: Express;
-
+export interface IServerConfig {
   listen(port: number): void;
 
   configureRoutes(routes: IRoutes): void;

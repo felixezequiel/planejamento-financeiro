@@ -1,10 +1,10 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { IRoutes, Route } from '../../routes/routes.type';
-import { IExpress } from './express.type';
 import cors from 'cors';
 import { configCors } from '../../../config/cors/configCors';
+import { IServerConfig } from './express.type';
 
-export class ExpressController implements IExpress {
+export class ExpressController implements IServerConfig {
   public app: Express;
 
   constructor() {
@@ -61,8 +61,8 @@ export class ExpressController implements IExpress {
     });
   }
 
-  public configureRoutes(routes: IRoutes): void {
-    routes.routes.forEach((route) => {
+  public configureRoutes({ routes }: IRoutes): void {
+    routes.forEach((route) => {
       if (route.middleware) {
         this.executeWithMiddlewares(route);
       } else {

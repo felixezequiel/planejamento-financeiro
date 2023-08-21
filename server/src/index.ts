@@ -3,7 +3,6 @@ import './config/environment';
 import { Routes } from './infrastructure/routes/routes';
 import { ExpressController } from './infrastructure/frameworks/express/expressController';
 import { TransactionUseCase } from './application/useCases/transaction/transactionUseCase';
-import { TransactionUpdate } from './application/useCases/transaction/transactionUseCase.type';
 
 const port = process.env.CONFIG_SERVER_PORT!;
 
