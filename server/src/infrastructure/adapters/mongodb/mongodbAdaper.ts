@@ -1,13 +1,13 @@
 import util from 'util';
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient, Db, ClientSession } from 'mongodb';
 import { IConnectionDB, InstanceClient } from '../adapters.type';
 
 const mongodbURI = process.env.MONGODB_URI!;
 
-export class MongodbAdapter implements IConnectionDB<Db, Db> {
+export class MongodbAdapter implements IConnectionDB<Db, Db, ClientSession> {
   public async connection<Response = void>(callback: InstanceClient<Db, Response>): Promise<Response> {
     try {
-      const client = new MongoClient(mongodbURI);
+      const client = new MongoClient(mongodbURI, { replicaSet: process.env.MONGO_RS_NAME });
 
       await client.connect();
 
@@ -31,7 +31,7 @@ export class MongodbAdapter implements IConnectionDB<Db, Db> {
     }
   }
 
-  public async transaction<Response = void>(callback: InstanceClient<Db, Response>): Promise<Response> {
+  public async transaction<Response = void>(callback: InstanceClient<Db, Response, ClientSession>): Promise<Response> {
     return await new Promise(async (resolve, reject) => {
       const client = new MongoClient(mongodbURI);
 
@@ -39,19 +39,15 @@ export class MongodbAdapter implements IConnectionDB<Db, Db> {
 
       const session = client.startSession();
 
+      session.startTransaction();
+
+      const db = client.db(process.env.DB_NAME);
       try {
-        const callbackTransaction = async () => {
-          const db = client.db(process.env.DB_NAME);
+        const response = await callback(db, session);
 
-          const callbackResponse = await callback(db).catch((e) => {
-            console.error({ processorError: e });
-            throw new Error(util.format(e));
-          });
+        await session.commitTransaction();
 
-          resolve(callbackResponse);
-        };
-
-        await session.withTransaction(callbackTransaction);
+        resolve(response);
       } catch (e) {
         await session.abortTransaction();
 

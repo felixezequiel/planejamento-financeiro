@@ -4,22 +4,60 @@ networks:
   local:
 
 services:
-  mongodb:
-    image: mongo
-    restart: always
-    ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
+  mongo-replica-setup:
+    container_name: mongo-setup
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    restart: on-failure
+    volumes:
+      - ./config/mongo/rs-init.sh:/scripts/rs-init.sh
+    # entrypoint: ["bash"]
+    entrypoint: ["bash", "/scripts/rs-init.sh" ]
     networks:
       - local
+    depends_on:
+      - mongodbtest0
+      - mongodbtest1
+      - mongodbtest2
+
+  mongodbtest0:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongodbtest0
+    cpus: 0.5
+    ports:
+      - 27017:27017
+    volumes:
+      - ./config/data/test0:/data/db
+    networks:
+      - local
+    command: mongod --replSet rs0 --bind_ip localhost,mongodbtest0
+
+  mongodbtest1:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongodbtest1
+    cpus: 0.5
+    ports:
+      - 27018:27017
+    volumes:
+     - ./config/data/test1:/data/db
+    networks:
+      - local
+    command: mongod --replSet rs0 --bind_ip localhost,mongodbtest1
+
+  mongodbtest2:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: mongodbtest2
+    cpus: 0.5
+    ports:
+      - 27019:27017
+    volumes:
+      - ./config/data/test2:/data/db
+    networks:
+      - local
+    command: mongod --replSet rs0 --bind_ip localhost,mongodbtest2
 
   server:
     build: ./server
     restart: always
-    depends_on:
-      - mongodb
     ports:
       - 3001:3001
     env_file:

@@ -17,7 +17,7 @@ export class TransactionUseCase {
 
     const transactionService = new TransactionService(transactionRepository);
 
-    await transactionService.update(payload._id, payload);
+    await transactionService.update(payload.id, payload);
   }
 
   public async delete(payload: { id: string }): Promise<void> {

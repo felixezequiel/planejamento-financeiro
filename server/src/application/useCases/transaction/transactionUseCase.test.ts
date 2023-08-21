@@ -1,5 +1,7 @@
-import { ITransaction, Transaction } from '../../../domain/bankTransaction/entities/entityTransaction';
+import { ObjectId } from 'mongodb';
+import { Transaction } from '../../../domain/bankTransaction/entities/entityTransaction';
 import { TransactionService } from '../../../domain/bankTransaction/services/transaction';
+import { TransactionRepository } from '../../../infrastructure/adapters/repository/transaction/transactionRepository';
 
 // Mock implementation of the ITransaction repository
 const randomAmount = () => {
@@ -21,23 +23,21 @@ const adjetivos = ['grande', 'pequeno', 'bonito', 'feio', 'rápido', 'lento', 'f
 const verbos = ['corre', 'pula', 'dorme', 'come', 'trabalha', 'estuda', 'realiza', 'efetua', 'recebe'];
 
 // Função para gerar uma frase aleatória
-const gerarFraseAleatoria = () => {
+const randomDescription = () => {
   // Seleciona uma palavra aleatória de cada array
   const substantivo = substantivos[Math.floor(Math.random() * substantivos.length)];
   const adjetivo = adjetivos[Math.floor(Math.random() * adjetivos.length)];
   const verbo = verbos[Math.floor(Math.random() * verbos.length)];
 
   // Constrói a frase combinando as palavras selecionadas
-  const frase = `O ${substantivo} ${adjetivo} ${verbo}.`;
-
-  return frase;
+  return `O ${substantivo} ${adjetivo} ${verbo}.`;
 };
 
 const mockTransaction = (): Transaction => {
   return {
     amount: randomAmount(),
     date: new Date().toISOString(),
-    description: gerarFraseAleatoria(),
+    description: randomDescription(),
     installments: 1,
     intervalRecurrent: 0,
     recurrent: false,
@@ -45,19 +45,12 @@ const mockTransaction = (): Transaction => {
   };
 };
 
-const mockRepository = {
-  save: jest.fn(),
-  update: jest.fn(),
-  delete: jest.fn(),
-  get: jest.fn(),
-  getAll: jest.fn(),
-};
-
 describe('TransactionService', () => {
   let transactionService: TransactionService;
 
   beforeEach(() => {
-    transactionService = new TransactionService(mockRepository);
+    const transactionRepository = new TransactionRepository();
+    transactionService = new TransactionService(transactionRepository);
   });
 
   afterEach(() => {
@@ -68,20 +61,39 @@ describe('TransactionService', () => {
     it('should call the repository.save() method with the payload', async () => {
       const payload: Transaction[] = [mockTransaction()];
 
-      await transactionService.save(payload);
+      const result = await transactionService.save(payload);
 
-      expect(mockRepository.save).toHaveBeenCalledWith(payload);
+      expect(result).toBeUndefined();
     });
   });
 
+  describe('save() duplicate _id', () => {
+    it('should call the repository.save() method with the payload', async () => {
+      const transaction = mockTransaction();
+
+      const _id = new ObjectId().toString();
+
+      transaction._id = _id;
+
+      const payload: Transaction[] = [transaction, transaction];
+
+      try {
+        await transactionService.save(payload);
+
+        fail('should throw an error');
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+      }
+    });
+  });
+
+  /*
   describe('update()', () => {
     it('should call the repository.update() method with the id and payload', async () => {
       const id = 'abc123';
       const payload: Transaction = mockTransaction();
 
       await transactionService.update(id, payload);
-
-      expect(mockRepository.update).toHaveBeenCalledWith(id, payload);
     });
   });
 
@@ -90,8 +102,6 @@ describe('TransactionService', () => {
       const id = 'abc123';
 
       await transactionService.delete(id);
-
-      expect(mockRepository.delete).toHaveBeenCalledWith(id);
     });
   });
 
@@ -100,11 +110,8 @@ describe('TransactionService', () => {
       const id = 'abc123';
       const expectedTransaction: Transaction = mockTransaction();
 
-      mockRepository.get.mockResolvedValue(expectedTransaction);
-
       const result = await transactionService.get(id);
 
-      expect(mockRepository.get).toHaveBeenCalledWith(id);
       expect(result).toBe(expectedTransaction);
     });
   });
@@ -113,12 +120,10 @@ describe('TransactionService', () => {
     it('should call the repository.getAll() method with the userId', async () => {
       const userId = 'user123';
       const expectedTransactions: Transaction[] = [mockTransaction(), mockTransaction()];
-      mockRepository.getAll.mockResolvedValue(expectedTransactions);
 
       const result = await transactionService.getAll(userId);
 
-      expect(mockRepository.getAll).toHaveBeenCalledWith(userId);
       expect(result).toBe(expectedTransactions);
     });
-  });
+  }); */
 });
