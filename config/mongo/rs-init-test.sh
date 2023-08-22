@@ -13,15 +13,18 @@ var cfg = {
     "members": [
         {
             "_id": 0,
-            "host": "mongodbtest0"
+            "host": "mongodbtest0",
+            "priority": 3
         },
         {
             "_id": 1,
-            "host": "mongodbtest1"
+            "host": "mongodbtest1",
+            "priority": 2
         },
         {
             "_id": 2,
             "host": "mongodbtest2",
+            "priority": 1
         }
     ]
 };
@@ -29,6 +32,8 @@ var cfg = {
 rs.initiate(cfg);
 
 rs.secondaryOk();
+
+db.getMongo().setReadPref('nearest');
 
 rs.status();
 EOF

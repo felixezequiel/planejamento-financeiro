@@ -3,6 +3,7 @@ import './config/environment';
 import { Routes } from './infrastructure/routes/routes';
 import { ExpressController } from './infrastructure/frameworks/express/expressController';
 import { TransactionUseCase } from './application/useCases/transaction/transactionUseCase';
+import { HTTPServer } from './infrastructure/httpServer/httpServer';
 
 const port = process.env.CONFIG_SERVER_PORT!;
 
@@ -48,7 +49,12 @@ const routesTransaction = new Routes([
 
 const expressController = new ExpressController();
 
-expressController.configureRoutes(routesHello);
 expressController.configureRoutes(routesTransaction);
 
 expressController.listen(Number(port));
+
+const httpServer = new HTTPServer();
+
+httpServer.configureRoutes(routesHello.routes);
+
+httpServer.listen(Number(port) + 1);

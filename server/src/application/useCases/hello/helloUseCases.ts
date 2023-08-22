@@ -3,8 +3,6 @@ import { HelloRepository } from '../../../infrastructure/adapters/repository/hel
 
 export class HelloUseCase {
   public async helloWorld(payload: any): Promise<void> {
-    console.log({ payload });
-
     const helloRepository = new HelloRepository();
 
     const hello = new Hello(helloRepository);
