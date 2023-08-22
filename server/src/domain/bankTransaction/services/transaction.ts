@@ -33,7 +33,7 @@ export class TransactionService implements ITransaction {
     await this.repository.delete(id);
   }
 
-  public async get(id: string): Promise<Transaction> {
+  public async get(id: string): Promise<Transaction | undefined> {
     return await this.repository.get(id);
   }
 

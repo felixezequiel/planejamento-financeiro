@@ -16,7 +16,7 @@ export interface ITransaction {
 
   delete(id: string): Promise<void>;
 
-  get(id: string): Promise<Transaction>;
+  get(id: string): Promise<Transaction | undefined>;
 
   getAll(userId: string): Promise<Transaction[]>;
 }

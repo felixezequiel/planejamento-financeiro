@@ -32,8 +32,20 @@ export class TransactionRepository implements ITransaction {
     throw new Error('Method not implemented.');
   }
 
-  public async get(id: string): Promise<Transaction> {
-    throw new Error('Method not implemented.');
+  public async get(id: string): Promise<Transaction | undefined> {
+    return await this.connectionDB.connection<Transaction | undefined>(async (db) => {
+      const collection = db.collection<Transaction>(TransactionRepository.COLLECTION_NAME);
+
+      const filter = { _id: new ObjectId(id) as unknown as string };
+
+      const response = await collection.findOne(filter);
+
+      if (!response) {
+        return undefined;
+      }
+
+      return response;
+    });
   }
 
   public async getAll(userId: string): Promise<Transaction[]> {

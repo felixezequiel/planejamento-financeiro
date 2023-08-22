@@ -82,7 +82,13 @@ describe('TransactionService', () => {
 
         fail('should throw an error');
       } catch (error) {
-        expect(error).toBeInstanceOf(Error);
+        const transaction = await transactionService.get(_id);
+
+        if (transaction) {
+          fail('should not save the transaction');
+        } else {
+          expect(error).toBeInstanceOf(Error);
+        }
       }
     });
   });

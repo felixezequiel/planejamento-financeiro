@@ -20,7 +20,7 @@ export class TransactionUseCase {
     await this.transactionService.delete(payload.id);
   }
 
-  public async get(payload: { id: string }): Promise<Transaction> {
+  public async get(payload: { id: string }): Promise<Transaction | undefined> {
     return await this.transactionService.get(payload.id);
   }
 
