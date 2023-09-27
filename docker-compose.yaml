@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 networks:
   local:
@@ -11,7 +11,7 @@ services:
     volumes:
       - ./config/mongo/rs-init-dev.sh:/scripts/rs-init-dev.sh
     # entrypoint: ["bash"]
-    entrypoint: ["bash", "/scripts/rs-init-dev.sh" ]
+    entrypoint: ["bash", "/scripts/rs-init-dev.sh"]
     networks:
       - local
     depends_on:
@@ -38,7 +38,7 @@ services:
     ports:
       - 27018:27017
     volumes:
-     - ./config/data/dev1:/data/db
+      - ./config/data/dev1:/data/db
     networks:
       - local
     command: mongod --replSet rs0 --bind_ip localhost,mongodb1
@@ -62,7 +62,7 @@ services:
     volumes:
       - ./config/mongo/rs-init-test.sh:/scripts/rs-init-test.sh
     # entrypoint: ["bash"]
-    entrypoint: ["bash", "/scripts/rs-init-test.sh" ]
+    entrypoint: ["bash", "/scripts/rs-init-test.sh"]
     networks:
       - local
     depends_on:
@@ -99,28 +99,3 @@ services:
     networks:
       - local
     command: mongod --replSet rs0 --bind_ip localhost,mongodbtest2
-
-  server:
-    build: ./server
-    restart: always
-    ports:
-      - 3001:3001
-      - 3002:3002
-    env_file:
-      - ./server/.env
-    volumes:
-      - ./server:/app
-    networks:
-      - local
-
-  web:
-    build: ./web
-    restart: always
-    ports:
-      - 3000:3000
-    depends_on:
-      - server
-    volumes:
-      - ./web:/app
-    networks:
-      - local

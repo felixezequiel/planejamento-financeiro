@@ -1,9 +1,8 @@
-import { HelloUseCase } from './application/useCases/hello/helloUseCases';
 import './config/environment';
+import { HelloUseCase } from './application/useCases/hello/helloUseCases';
 import { Routes } from './infrastructure/routes/routes';
 import { ExpressController } from './infrastructure/frameworks/express/expressController';
 import { TransactionUseCase } from './application/useCases/transaction/transactionUseCase';
-import { HTTPServer } from './infrastructure/httpServer/httpServer';
 
 const port = process.env.CONFIG_SERVER_PORT!;
 
@@ -13,7 +12,7 @@ const routesHello = new Routes([
   {
     path: '/hello',
     verb: 'post',
-    handler: helloUseCase.helloWorld.bind<any>(helloUseCase),
+    handler: helloUseCase.helloWorld.bind(helloUseCase),
   },
 ]);
 
@@ -51,10 +50,6 @@ const expressController = new ExpressController();
 
 expressController.configureRoutes(routesTransaction);
 
+expressController.configureRoutes(routesHello);
+
 expressController.listen(Number(port));
-
-const httpServer = new HTTPServer();
-
-httpServer.configureRoutes(routesHello.routes);
-
-httpServer.listen(Number(port) + 1);
