@@ -1,10 +1,3 @@
-import "../../app/globals.css";
-import TranslateLoginController from "@/app/controller/translate/login";
-import {
-  TextCompletionObject,
-  TranslateContent,
-  TranslateLogin,
-} from "@/app/controller/translate/translate.type";
 import {
   Button,
   Card,
@@ -12,43 +5,14 @@ import {
   Input,
   Typography,
 } from "@material-tailwind/react";
-import type { InferGetStaticPropsType, GetStaticProps } from "next";
-
-export const getStaticProps = (async () => {
-  const content = new TranslateLoginController().content();
-
-  const response = await fetch("https://api.openai.com/v1/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      prompt: `Translate the values from this object '${JSON.stringify(
-        content
-      )}' to el`,
-      max_tokens: 4000,
-      model: "gpt-3.5-turbo-instruct",
-      temperature: 0,
-    }),
-  });
-
-  const data: TextCompletionObject = await response.json();
-
-  const [{ text }] = data.choices;
-
-  const translatedText = JSON.parse(
-    text.replace("\n", "")
-  ) as TranslateContent<TranslateLogin>;
-
-  return { props: { translatedText } };
-}) satisfies GetStaticProps<{
-  translatedText: TranslateContent<TranslateLogin>;
-}>;
+import {
+  TranslateLogin,
+  TranslatedText,
+} from "@/app/controller/translate/translate.type";
 
 export default function Login({
   translatedText,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+}: TranslatedText<TranslateLogin>) {
   return (
     <Card color="transparent" shadow={false}>
       <Typography variant="h4" color="blue-gray">

@@ -1,3 +1,7 @@
+export interface TranslateHome {
+  TITLE_HOME: string;
+  DESCRIPTION_HOME: string;
+}
 export interface TranslateLogin {
   SIGN_UP: string
   SIGN_UP_LEGEND: string
@@ -32,11 +36,17 @@ export interface TextCompletionObject {
   };
 }
 
+export interface TranslatedText<T> {
+  translatedText: T
+}
+
+export type TranslateText = TranslatedText<TranslateLogin> | TranslatedText<TranslateHome>
+
 
 export type TranslateContent<T> = {
   [key in keyof T]: string
 }
 
 export interface TranslateConfigure<T> {
-  content(): TranslateContent<T>
+  content(): TranslateText
 }
